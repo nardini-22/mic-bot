@@ -20,10 +20,18 @@
     "windows": [
       {
         "fullscreen": false,
-        "resizable": true,
+        "resizable": false,
         "title": "mic-bot",
-        "width": 800,
-        "height": 600
+        "width": 280,
+        "height": 354,
+        "visible": false,
+        "hiddenTitle": true,
+        "alwaysOnTop": true,
+        "closable": false,
+        "minimizable": false,
+        "decorations": false,
+        "focus": false,
+        "transparent": false
       }
     ],
     "security": {
@@ -40,6 +48,11 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ]
+    },
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true,
+      "menuOnLeftClick": false
     }
   }
 }
