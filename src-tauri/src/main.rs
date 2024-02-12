@@ -1,8 +1,16 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![cfg_attr(
+    all(not(debug_assertions), target_os = "windows"),
+    windows_subsystem = "windows"
+  )]
 
 use tauri::{Manager, SystemTray, SystemTrayEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
+use window_vibrancy::apply_blur;
+
+pub enum Mode {
+    Dark, Light, Default
+}
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
@@ -21,8 +29,13 @@ fn main() {
                 ..
             } => {
                 let window = app.get_window("main").unwrap();
-
                 let _ = window.move_window(Position::TrayCenter);
+
+                #[cfg(target_os = "windows")]
+                
+                apply_blur(&window, Some((18, 18, 18, 125)))
+                .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
+
                 if window.is_visible().unwrap() {
                     window.hide().unwrap();
                 } else {

@@ -31,7 +31,7 @@
         "minimizable": false,
         "decorations": false,
         "focus": false,
-        "transparent": false
+        "transparent": true
       }
     ],
     "security": {
