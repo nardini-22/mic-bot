@@ -6,7 +6,7 @@
 
 use tauri::{Manager, SystemTray, SystemTrayEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
-use window_vibrancy::apply_blur;
+use window_vibrancy::apply_acrylic;
 
 pub enum Mode {
     Dark, Light, Default
@@ -33,7 +33,7 @@ fn main() {
 
                 #[cfg(target_os = "windows")]
                 
-                apply_blur(&window, Some((18, 18, 18, 125)))
+                apply_acrylic(&window, Some((18, 18, 18, 125)))
                 .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
 
                 if window.is_visible().unwrap() {
