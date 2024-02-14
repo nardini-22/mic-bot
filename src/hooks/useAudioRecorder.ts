@@ -1,42 +1,43 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 
 export const useAudioRecorder = () => {
-  let mediaRecorder: MediaRecorder
-  let audioChunks: Blob[] = []
-
+  const [isRecording, setIsRecording] = useState<boolean>(false)
+  const mediaRecorder = useRef<MediaRecorder | null>(null)
+  const chunks = useRef<Blob[]>([])
   const audioPlayer = useRef<HTMLAudioElement | null>(null)
 
   const startRecording = () => {
-    audioChunks = []
-    mediaRecorder.start()
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
+        mediaRecorder.current = new MediaRecorder(stream)
+
+        mediaRecorder.current.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            chunks.current.push(event.data)
+          }
+        }
+
+        mediaRecorder.current.onstop = () => {
+          const audioBlob = new Blob(chunks.current, { type: 'audio/wav' })
+          const audioUrl = URL.createObjectURL(audioBlob)
+          if (audioPlayer.current) audioPlayer.current.src = audioUrl
+          console.log('Áudio gravado:', audioUrl)
+        }
+
+        mediaRecorder.current.start()
+        setIsRecording(true)
+      })
+      .catch((error) => {
+        console.error('Erro ao acessar o microfone:', error)
+      })
   }
 
   const stopRecording = () => {
-    if (mediaRecorder.state === 'recording') {
-      mediaRecorder.stop()
+    if (mediaRecorder.current && isRecording) {
+      mediaRecorder.current.stop()
+      setIsRecording(false)
     }
   }
-
-  navigator.mediaDevices
-    .getUserMedia({ audio: true })
-    .then((stream) => {
-      mediaRecorder = new MediaRecorder(stream)
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunks.push(event.data)
-        }
-      }
-
-      mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' })
-        const audioUrl = URL.createObjectURL(audioBlob)
-        if (audioPlayer.current) audioPlayer.current.src = audioUrl
-      }
-    })
-    .catch((err) => {
-      console.log('Erro ao acessar o microfone:', err)
-    })
-
-  return { audioPlayer, startRecording, stopRecording }
+  return { audioPlayer, isRecording, startRecording, stopRecording }
 }
